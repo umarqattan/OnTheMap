@@ -20,6 +20,8 @@ class MapListTabBarController : UITabBarController, UINavigationControllerDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        /** Added a pin bar button on navigation bar  **/
+        
         informationPostingPinBarButtonItemImage = UIImage(named: "Pin-25")
         informationPostingPinBarButtonItem = UIBarButtonItem(image: informationPostingPinBarButtonItemImage,
             style: UIBarButtonItemStyle.Plain,
@@ -69,6 +71,10 @@ class MapListTabBarController : UITabBarController, UINavigationControllerDelega
         presentViewController(informationPostingViewController, animated: true, completion: nil)
     }
     
+    
+    /**
+        MARK: Function to ensure secure logout
+    **/
     func deleteSessionID() {
         let urlString = API.Udacity.baseURL + API.Udacity.Methods.session
         let url = NSURL(string: urlString)!

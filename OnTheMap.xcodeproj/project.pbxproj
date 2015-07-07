@@ -104,7 +104,6 @@
 				E105927A1B3E83EA00FCB92C /* ListTableViewController.swift */,
 				E105927C1B3E840100FCB92C /* InformationPostingViewController.swift */,
 				E105925A1B3E685E00FCB92C /* UdacityLoginViewController.swift */,
-				E105925F1B3E685E00FCB92C /* Images.xcassets */,
 				E10592561B3E685E00FCB92C /* Supporting Files */,
 			);
 			name = Controller;
@@ -114,6 +113,7 @@
 		E10592561B3E685E00FCB92C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E105925F1B3E685E00FCB92C /* Images.xcassets */,
 				E10592581B3E685E00FCB92C /* AppDelegate.swift */,
 				E10592571B3E685E00FCB92C /* Info.plist */,
 			);

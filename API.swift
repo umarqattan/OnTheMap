@@ -93,43 +93,33 @@ class API {
         return task
     }
     
-    static func getRequest(baseURL : String, api : String, headers : [String : String], queryString : [String : String]) -> NSMutableURLRequest {
-        let url = buildURL(baseURL, api: api, queryString: queryString)
+    static func getRequest(baseURL : String, api : String, headers : [String : String]) -> NSMutableURLRequest {
+        let url = buildURL(baseURL, api: api)
         let request = NSMutableURLRequest(URL: url)
         request.addValue(jsonValue, forHTTPHeaderField: HTTP.Request.key)
+        
+        /**
+            Note: For (key, value) pairs in the headers dictionary,
+                  add the values to the NSMutableURLRequest.
+        **/
         for (key, value) in headers {
             request.addValue(value, forHTTPHeaderField: key)
         }
         return request
     }
     
-    static func postRequest(baseURL : String, api : String, body : [String : AnyObject], headers : [String : String], queryString : [String : String]) -> NSMutableURLRequest {
+    static func postRequest(baseURL : String, api : String, body : [String : AnyObject], headers : [String : String]) -> NSMutableURLRequest {
         var parsingError : NSError? = nil
-        let request = getRequest(baseURL, api: api, headers: headers, queryString: queryString)
+        let request = getRequest(baseURL, api: api, headers: headers)
         request.HTTPMethod = HTTP.Methods.POST
         request.addValue(jsonValue, forHTTPHeaderField: HTTP.Request.value)
         request.HTTPBody = NSJSONSerialization.dataWithJSONObject(body, options: nil, error: &parsingError)
         return request
     }
     
-    static func buildURL(baseURL : String, api : String, queryString : [String : String]) -> NSURL {
-        let urlString = baseURL + api + escapedParameters(queryString)
+    static func buildURL(baseURL : String, api : String) -> NSURL {
+        let urlString = baseURL + api
         return NSURL(string: urlString)!
-    }
-    
-    static func escapedParameters(parameters: [String : AnyObject]) -> String {
-        
-        var urlVars = [String]()
-        
-        for (key, value) in parameters {
-            /* Make sure that it is a string value */
-            let stringValue = "\(value)"
-            /* Escape it */
-            let escapedValue = stringValue.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
-            /* Append it */
-            urlVars += [key + "=" + "\(escapedValue!)"]
-        }
-        return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
     }
     
 }

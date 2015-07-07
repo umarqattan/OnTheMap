@@ -11,11 +11,16 @@ import UIKit
 
 class UdacityLogin {
 
+    
+    /**
+        MARK: methods to ensure secure authentication with Udacity and receipt of user
+              information (i.e. userID, sessionID, and name).
+    **/
     func secureLogin(email : String, password : String, completionHandler : (success : Bool, error : String?) -> Void) {
         var body = getBody(email, password: password)
         var headers = [String : String]()
         var queryString = [String : String]()
-        var request = API.postRequest(API.Udacity.baseURL, api: API.Udacity.Methods.session, body: body, headers: headers, queryString: queryString)
+        var request = API.postRequest(API.Udacity.baseURL, api: API.Udacity.Methods.session, body: body, headers: headers)
         let task = API.buildTask(request) { data, downloadError in
             if let error = downloadError {
                 completionHandler(success: false, error: "Could not complete login request")
@@ -36,8 +41,12 @@ class UdacityLogin {
     func getUserInformation(userID : String, completionHandler : (success : Bool, error : String?) -> Void) {
         var headers = [String : String]()
         var queryString = [String : String]()
+        
+        /**
+            Source:
+        **/
         let api = API.Udacity.Methods.userInfo.stringByReplacingOccurrencesOfString("{id}", withString: userID, options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
-        var request = API.getRequest(API.Udacity.baseURL, api: api, headers: headers, queryString: queryString)
+        var request = API.getRequest(API.Udacity.baseURL, api: api, headers: headers)
         let task = API.buildTask(request) { data, downloadError in
             if let error = downloadError {
                 completionHandler(success: false, error: "Could not complete session request")

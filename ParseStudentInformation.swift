@@ -10,19 +10,24 @@ import Foundation
 
 class ParseStudentInformation {
     
+    /**
+        MARK: Helper methods to GET student information as well as posting
+              student input information using the Parse API.
+    **/
+    
     func GETStudentInformation(completionHandler: (pins: [StudentInformation]?, success: Bool, error: String?) -> Void) {
         var headers = buildHeaders()
-        var request = API.getRequest(API.Parse.baseURL, api: API.Parse.Methods.studentLocation, headers: headers, queryString: [String: String]())
-        var task = API.buildTask(request){ (data, error) in
-            if let e = error{
+        var request = API.getRequest(API.Parse.baseURL, api: API.Parse.Methods.studentLocation, headers: headers)
+        var task = API.buildTask(request){ (data, downloadError) in
+            if let error = downloadError {
                 completionHandler(pins: nil, success: false, error: "Could not complete request")
             } else {
-                let response = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error: nil) as? [String: AnyObject]
-                if let error = response!["error"] as? String{
+                let response = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error: nil) as! NSDictionary
+                if let error = response["error"] as? String {
                     completionHandler(pins: nil, success: false, error: error)
                 } else {
                     var pins = [StudentInformation]()
-                    var results = response!["results"] as! [[String: AnyObject]]
+                    var results = response["results"] as! [[String: AnyObject]]
                     for result in results {
                         pins.append(self.buildPin(result))
                     }
@@ -34,9 +39,9 @@ class ParseStudentInformation {
     
     func POSTStudentInformation(body: [String: AnyObject], completionHandler: (success: Bool, error: String?) -> Void) {
         var headers = buildHeaders()
-        var request = API.postRequest(API.Parse.baseURL, api: API.Parse.Methods.studentLocation, body: body, headers: headers, queryString: [:])
-        var task = API.buildTask(request) { (data, error) in
-            if let e = error {
+        var request = API.postRequest(API.Parse.baseURL, api: API.Parse.Methods.studentLocation, body: body, headers: headers)
+        var task = API.buildTask(request) { (data, downloadError) in
+            if let error = downloadError {
                 completionHandler(success: false, error: "Could not complete request")
             } else {
                 let parsedResults = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error: nil) as! [String: AnyObject]

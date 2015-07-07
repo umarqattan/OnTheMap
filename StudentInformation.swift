@@ -20,6 +20,7 @@ struct StudentInformation {
     var uniqueKey : String?
     
     init(dictionary : [String : AnyObject]) {
+        
         if let firstName = dictionary["firstName"] as? String {
             self.firstName = firstName
         }

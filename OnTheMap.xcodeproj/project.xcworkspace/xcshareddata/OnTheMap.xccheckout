@@ -12,20 +12,24 @@
 	<dict>
 		<key>3377A14AABFB8BF84B72EA683354A7C77EB9323C</key>
 		<string>https://github.com/umarqattan/MemeMe.git</string>
+		<key>BA21E8EEA89246420CA425D35EC0E2156DB5CB7C</key>
+		<string>https://github.com/umarqattan/OnTheMap.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>OnTheMap/OnTheMap.xcodeproj</string>
+	<string>OnTheMap.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>3377A14AABFB8BF84B72EA683354A7C77EB9323C</key>
 		<string>../../..</string>
+		<key>BA21E8EEA89246420CA425D35EC0E2156DB5CB7C</key>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/umarqattan/MemeMe.git</string>
+	<string>https://github.com/umarqattan/OnTheMap.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>3377A14AABFB8BF84B72EA683354A7C77EB9323C</string>
+	<string>BA21E8EEA89246420CA425D35EC0E2156DB5CB7C</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -34,7 +38,15 @@
 			<key>IDESourceControlWCCIdentifierKey</key>
 			<string>3377A14AABFB8BF84B72EA683354A7C77EB9323C</string>
 			<key>IDESourceControlWCCName</key>
-			<string>iOS%20Apps</string>
+			<string></string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>BA21E8EEA89246420CA425D35EC0E2156DB5CB7C</string>
+			<key>IDESourceControlWCCName</key>
+			<string>OnTheMap</string>
 		</dict>
 	</array>
 </dict>
