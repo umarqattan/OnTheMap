@@ -53,7 +53,7 @@ class MapListTabBarController : UITabBarController, UINavigationControllerDelega
     }
     
     @IBAction func logout(sender: UIBarButtonItem) {
-        deleteSessionID()
+        loggingOut()
     }
     
     @IBAction func refresh(sender: UIBarButtonItem) {
@@ -75,51 +75,19 @@ class MapListTabBarController : UITabBarController, UINavigationControllerDelega
     /**
         MARK: Function to ensure secure logout
     **/
-    func deleteSessionID() {
-        let urlString = API.Udacity.baseURL + API.Udacity.Methods.session
-        let url = NSURL(string: urlString)!
-        let request = NSMutableURLRequest(URL: url)
-        var xsrfCookie : NSHTTPCookie? = nil
-        let sharedCookieStorage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
-        for cookie in sharedCookieStorage.cookies as! [NSHTTPCookie] {
-            if cookie.name == "XSRF-TOKEN" {
-                xsrfCookie = cookie
-            }
-        }
-        if let xsrfCookie = xsrfCookie {
-            request.addValue(xsrfCookie.value!, forHTTPHeaderField: "X-XSRF-Token")
-        }
-        let session = NSURLSession.sharedSession()
-        let task = session.dataTaskWithRequest(request) { data, response, error in
-            if error != nil {
-                return
-            }
-            let newData = data.subdataWithRange(NSMakeRange(5, data.length - 5)) /* subset response data! */
-            var parsingError: NSError? = nil
-            let parsedResult = NSJSONSerialization.JSONObjectWithData(newData, options: NSJSONReadingOptions.AllowFragments, error: &parsingError) as! NSDictionary
-            if let session = parsedResult["session"] as? [String : AnyObject] {
-                if let sessionID = session["id"] as? String {
-                    if !sessionID.isEmpty {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            self.returnToLoginScreen()
-                        }
-                    } else {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            println("SessionID was empty")
-                        }
-                    }
-                } else {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        println("SessionID could not be found")
-                    }
-                }
+    
+    func loggingOut() {
+        UdacityLogin().secureLogOut() { success, downloadError in
+            if success {
+                self.returnToLoginScreen()
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
-                    println("Session could not be found")
-                }
+                var message = "There was a problem logging out. Try again later"
+                let alertController = UIAlertController(title: "Error", message: message , preferredStyle: UIAlertControllerStyle.Alert)
+                let alertAction = UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Cancel, handler: nil)
+                alertController.addAction(alertAction)
+                self.presentViewController(alertController, animated: true, completion: nil)
             }
         }
-        task.resume()
     }
     
 }

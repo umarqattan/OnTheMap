@@ -47,38 +47,75 @@ class InformationPostingViewController : UIViewController, MKMapViewDelegate, UI
 
     
     @IBAction func findOnTheMap(sender: UIButton) {
+        
+        
+        findOnTheMapButton.hidden = true
         activityIndicator.hidden = false
         activityIndicator.startAnimating()
         
         getGeocodeWithAddress()
-        configureUIViews()
     }
     
     @IBAction func submit(sender: UIButton) {
-        ParseStudentInformation().POSTStudentInformation(buildInfoTableBody()) { success, downloadError in
-            if let error = downloadError {
-                dispatch_async(dispatch_get_main_queue()) {
-                    var message = "Could not complete POST request"
-                    let alertController = UIAlertController(title: "Error", message: message , preferredStyle: UIAlertControllerStyle.Alert)
-                    let alertAction = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.Cancel, handler: nil)
-                    alertController.addAction(alertAction)
-                    self.presentViewController(alertController, animated: true, completion: nil)
-                }
-            } else {
-                dispatch_async(dispatch_get_main_queue()) {
-                    var message = "Successfully added a pin to the map!"
-                    let alertController = UIAlertController(title: "Success", message: message , preferredStyle: UIAlertControllerStyle.Alert)
-                    let alertAction = UIAlertAction(title: "Awesome!", style: UIAlertActionStyle.Cancel) { UIAlertAction in
-                        var student = self.buildInfoTableBody()
-                        var postStudentInformation = StudentInformation(dictionary: student)
-                        (UIApplication.sharedApplication().delegate as! AppDelegate).studentInformations.append(postStudentInformation)
-                        self.dismissViewControllerAnimated(true, completion: nil)
+        
+        self.submitButton.hidden = true
+        self.activityIndicator.hidden = false
+        self.activityIndicator.startAnimating()
+        
+        if let mediaURL = linkTextfield.text {
+            if let url = NSURL(string: mediaURL) {
+                if (url.scheme != nil) && (url.host != nil) {
+                    ParseStudentInformation().POSTStudentInformation(buildInfoTableBody()) { success, downloadError in
+                        if let error = downloadError {
+                            dispatch_async(dispatch_get_main_queue()) {
+                                var message = "Could not add pin to the map"
+                                let alertController = UIAlertController(title: "Error", message: message , preferredStyle: UIAlertControllerStyle.Alert)
+                                let alertAction = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.Cancel) { UIAlertAction in
+                                    self.submitButton.hidden = false
+                                }
+                                alertController.addAction(alertAction)
+                                self.activityIndicator.hidden = true
+                                self.activityIndicator.stopAnimating()
+                                self.presentViewController(alertController, animated: true, completion: nil)
+                            }
+                        } else {
+                            dispatch_async(dispatch_get_main_queue()) {
+                                var message = "Successfully added a pin to the map!"
+                                let alertController = UIAlertController(title: "Success", message: message , preferredStyle: UIAlertControllerStyle.Alert)
+                                let alertAction = UIAlertAction(title: "Awesome!", style: UIAlertActionStyle.Cancel) { UIAlertAction in
+                                    var student = self.buildInfoTableBody()
+                                    var postStudentInformation = StudentInformation(dictionary: student)
+                                    (UIApplication.sharedApplication().delegate as! AppDelegate).studentInformations.append(postStudentInformation)
+                                    self.submitButton.hidden = false
+                                    self.dismissViewControllerAnimated(true, completion: nil)
+                                }
+                                alertController.addAction(alertAction)
+                                self.activityIndicator.hidden = true
+                                self.activityIndicator.stopAnimating()
+                                self.presentViewController(alertController, animated: true, completion: nil)
+                            }
+                        }
                     }
-                    alertController.addAction(alertAction)
-                    self.presentViewController(alertController, animated: true, completion: nil)
+                } else {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        var message = "The link provided was invalid"
+                        let alertController = UIAlertController(title: "Error", message: message , preferredStyle: UIAlertControllerStyle.Alert)
+                        let alertAction = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.Cancel) { UIAlertAction in
+                            self.submitButton.hidden = false
+                            self.submitButton.enabled = false
+                            self.linkTextfield.text = "Enter a link to share"
+                        }
+                        alertController.addAction(alertAction)
+                        self.activityIndicator.hidden = true
+                        self.activityIndicator.stopAnimating()
+                        self.presentViewController(alertController, animated: true, completion: nil)
+                    }
                 }
             }
         }
+
+        
+        
     }
     
     func buildInfoTableBody() -> [String: AnyObject] {
@@ -119,6 +156,7 @@ class InformationPostingViewController : UIViewController, MKMapViewDelegate, UI
         mapView.hidden = true
         linkTextfield.enabled = false
         linkTextfield.hidden = true
+        activityIndicator.hidden = true
     }
     
     func configureUIViews() {
@@ -127,12 +165,12 @@ class InformationPostingViewController : UIViewController, MKMapViewDelegate, UI
         topView.backgroundColor = UIColor(red: 0.2, green: 0.576, blue: 0.824, alpha: 1.0)
         
         locationNameView.removeFromSuperview()
-        findOnTheMapButton.removeFromSuperview()
         
         locationTextfield.enabled = false
         locationTextfield.hidden = true
         
         submitButton.hidden = false
+        submitButton.enabled = false
         submitButton.bringSubviewToFront(bottomView)
         
         bottomView.opaque = false
@@ -141,9 +179,12 @@ class InformationPostingViewController : UIViewController, MKMapViewDelegate, UI
         view.bringSubviewToFront(bottomView)
         mapView.bringSubviewToFront(bottomView)
         mapView.bringSubviewToFront(submitButton)
+        mapView.bringSubviewToFront(activityIndicator)
+        bottomView.bringSubviewToFront(activityIndicator)
+        submitButton.bringSubviewToFront(activityIndicator)
         view.backgroundColor = UIColor(white: 0.0, alpha: 0.15)
         
-        locationNameView.sendSubviewToBack(mapView)
+        
         mapView.hidden = false
         
         questionLabel.hidden = true
@@ -163,8 +204,11 @@ class InformationPostingViewController : UIViewController, MKMapViewDelegate, UI
                 self.annotation = MKPlacemark(placemark: placemark)
                 self.mapView.addAnnotation(MKPlacemark(placemark: placemark))
                 self.mapView.showAnnotations([self.annotation], animated: true)
+                self.findOnTheMapButton.hidden = true
                 self.activityIndicator.hidden = true
+                self.configureUIViews()
                 self.activityIndicator.stopAnimating()
+                self.submitButton.enabled = true
                 }
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
@@ -174,6 +218,8 @@ class InformationPostingViewController : UIViewController, MKMapViewDelegate, UI
                     alertController.addAction(alertAction)
                     self.presentViewController(alertController, animated: true, completion: nil)
                     self.activityIndicator.hidden = true
+                    self.submitButton.bringSubviewToFront(self.activityIndicator)
+                    self.findOnTheMapButton.hidden = false
                     self.activityIndicator.stopAnimating()
                     
                 }
@@ -200,9 +246,8 @@ class InformationPostingViewController : UIViewController, MKMapViewDelegate, UI
         }
         if textField == linkTextfield && textField.text.isEmpty {
             textField.text = "Enter a link to share"
-        } else {
-            submitButton.enabled = true
         }
+        submitButton.enabled = true
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {

@@ -19,7 +19,6 @@ class UdacityLogin {
     func secureLogin(email : String, password : String, completionHandler : (success : Bool, error : String?) -> Void) {
         var body = getBody(email, password: password)
         var headers = [String : String]()
-        var queryString = [String : String]()
         var request = API.postRequest(API.Udacity.baseURL, api: API.Udacity.Methods.session, body: body, headers: headers)
         let task = API.buildTask(request) { data, downloadError in
             if let error = downloadError {
@@ -38,13 +37,43 @@ class UdacityLogin {
         }
     }
     
+    func secureLogOut(completionHandler : (success: Bool, error : String?) -> Void) {
+        
+        var headers = [String : String]()
+        var xsrfCookie : NSHTTPCookie? = nil
+        for cookie in API.HTTP.Cookie.sharedCookieStorage.cookies as! [NSHTTPCookie] {
+            if cookie.name == API.HTTP.Cookie.cookieName {
+                xsrfCookie = cookie
+            }
+        }
+        if let xsrfCookie = xsrfCookie {
+            headers[API.HTTP.Cookie.Request.value] = xsrfCookie.value!
+        }
+        
+        let request = API.getRequest(API.Udacity.baseURL, api: API.Udacity.Methods.session, headers: headers)
+        let task = API.buildTask(request) { data, downloadError in
+            if let error = downloadError {
+                completionHandler(success: false, error: "Could not log out")
+            } else {
+                var parsingError : NSError? = nil
+                let newData = data.subdataWithRange(NSMakeRange(5, data.length - 5))
+                let parsedResults = NSJSONSerialization.JSONObjectWithData(newData, options: NSJSONReadingOptions.AllowFragments, error: &parsingError) as! [String : AnyObject]
+                if let session = parsedResults["session"] as? [String : AnyObject] {
+                    if let id = session["id"] as? String {
+                        if !id.isEmpty {
+                            completionHandler(success: true, error: nil)
+                        }
+                    } else {
+                        completionHandler(success: false, error: "Could not logout successfully")
+                    }
+                }
+            }
+        }
+    }
+    
+    
     func getUserInformation(userID : String, completionHandler : (success : Bool, error : String?) -> Void) {
         var headers = [String : String]()
-        var queryString = [String : String]()
-        
-        /**
-            Source:
-        **/
         let api = API.Udacity.Methods.userInfo.stringByReplacingOccurrencesOfString("{id}", withString: userID, options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
         var request = API.getRequest(API.Udacity.baseURL, api: api, headers: headers)
         let task = API.buildTask(request) { data, downloadError in

@@ -55,10 +55,22 @@ class API {
         }
         
         static let baseURL = "https://www.udacity.com/"
-    
+        
+        
     }
     
     struct HTTP {
+        
+        struct Cookie {
+            
+            struct Request {
+                static let value = "X-XSRF-Token"
+            }
+            
+            static let cookieName = "XSRF-TOKEN"
+            static let sharedCookieStorage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
+            
+        }
         
         struct Request {
             static let value = "Content-Type"

@@ -32,6 +32,9 @@ class MapViewController : UIViewController, MKMapViewDelegate, UINavigationContr
 
     }
     
+    
+    
+    
     func mapViewDidFinishLoadingMap(mapView: MKMapView!) {
         
         self.activityView.stopAnimating()

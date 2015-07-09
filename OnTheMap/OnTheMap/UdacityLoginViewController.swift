@@ -70,17 +70,43 @@ class UdacityLoginViewController: UIViewController, UITextFieldDelegate, UIGestu
                 var user = UdacityLogin().getAppDelegate().user
                 UdacityLogin().getUserInformation(user!.key) { success, downloadError in
                     if success {
-                        self.completeLogin()
+                        var infoAPI = ParseStudentInformation()
+                        infoAPI.GETStudentInformation(){ (info, success, error) in
+                            if success{
+                                (UIApplication.sharedApplication().delegate as! AppDelegate).studentInformations = info!
+                                self.completeLogin()
+                            } else {
+                                var message = error
+                                let alertController = UIAlertController(title: "Error", message: message , preferredStyle: UIAlertControllerStyle.Alert)
+                                let alertAction = UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Cancel, handler: nil)
+                                alertController.addAction(alertAction)
+                                self.presentViewController(alertController, animated: true, completion: nil)
+                            }
+                        }
+                        //self.completeLogin()
                     } else {
-                        self.displayAlertController("Error", message: "Could not complete login")
+                        self.displayAlertController("Error", message: downloadError!)
                         self.activityIndicator.stopAnimating()
                         self.activityIndicator.hidden = true
                     }
                 }
             } else {
-                self.displayAlertController("Error", message: "Could not complete login request")
-                self.activityIndicator.stopAnimating()
-                self.activityIndicator.hidden = true
+                self.displayAlertController("Error", message: downloadError!)
+            }
+        }
+    }
+    
+    func getInfo() {
+        var infoAPI = ParseStudentInformation()
+        infoAPI.GETStudentInformation(){ (info, success, error) in
+            if success{
+                (UIApplication.sharedApplication().delegate as! AppDelegate).studentInformations = info!
+            } else {
+                var message = error
+                let alertController = UIAlertController(title: "Error", message: message , preferredStyle: UIAlertControllerStyle.Alert)
+                let alertAction = UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Cancel, handler: nil)
+                alertController.addAction(alertAction)
+                self.presentViewController(alertController, animated: true, completion: nil)
             }
         }
     }
@@ -89,7 +115,10 @@ class UdacityLoginViewController: UIViewController, UITextFieldDelegate, UIGestu
         
         dispatch_async(dispatch_get_main_queue()) {
             let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-            let alertAction = UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Cancel, handler: nil)
+            let alertAction = UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Cancel) { UIAlertAction in
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.hidden = true
+            }
             alertController.addAction(alertAction)
             self.presentViewController(alertController, animated: true, completion: nil)
         }
