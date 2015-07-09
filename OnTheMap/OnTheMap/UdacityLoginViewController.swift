@@ -83,7 +83,6 @@ class UdacityLoginViewController: UIViewController, UITextFieldDelegate, UIGestu
                                 self.presentViewController(alertController, animated: true, completion: nil)
                             }
                         }
-                        //self.completeLogin()
                     } else {
                         self.displayAlertController("Error", message: downloadError!)
                         self.activityIndicator.stopAnimating()
